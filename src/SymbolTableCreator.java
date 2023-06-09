@@ -124,16 +124,16 @@ public class SymbolTableCreator extends VapaPithaBaseListener {
             String currentScope = scopeStack.peek();
             SymbolTable currentSymbolTable = symbolTables.get(currentScope);
 
+            while(currentSymbolTable.getVariable(variableName) == null && currentSymbolTable.getParentScope() != null) {
+                currentSymbolTable = symbolTables.get(currentSymbolTable.getParentScope());
+                //System.out.println(currentSymbolTable.getVariable(variableName).getName() + "Yaaaay");
 
+            }
 
             if (currentSymbolTable.getVariable(variableName) == null) {
                 hasErrorFlag = true;
                 throw new Exception("Variable name is not declared in this scope in line " + ctx.start.getLine());
             }
-
-//            while(currentSymbolTable.getVariable(variableName) == null && currentSymbolTable.getParentScope() != null) {
-//                currentSymbolTable = symbolTables.get(currentSymbolTable.getParentScope());
-//            }
 
         }
     }
@@ -221,14 +221,14 @@ public class SymbolTableCreator extends VapaPithaBaseListener {
 
     public static void main(String[] args) {
         String sourceCode =
-                "বাস্তবসংখ্যা ত = ১;" +
-                "বাস্তবসংখ্যা যোগ(বাস্তবসংখ্যা ক, বাস্তবসংখ্যা খ) {\n" +
-                        "               ক = ক + খ;\n" +
-                        "               ফেরত ক;\n" +
-                        "       }\n" +
+                        "বাস্তবসংখ্যা ত = ১;" +
+                        "বাস্তবসংখ্যা বিয়োগ(বাস্তবসংখ্যা ক, বাস্তবসংখ্যা খ) {\n" +
+                                "ক = ক - খ;\n" +
+                        "        ফেরত ক;\n" +
+                        "}\n" +
                         "বাস্তবসংখ্যা শুরু () {\n" +
                         "       পূর্ণসংখ্যা ক = ০, খ = -১, গ;\n" +
-                        //"       যোগফল =  যোগ(ক, খ);\n" +
+                        "       বাস্তবসংখ্যা বিয়োগফল =  বিয়োগ(ক, খ);\n" +
                         "}   ";
         SymbolTableCreator symbolTableCreator = new SymbolTableCreator();
         symbolTableCreator.createSymbolTable(sourceCode);
