@@ -1,0 +1,431 @@
+grammar VapaPitha;
+
+primaryExpression
+    :   Identifier
+    |   Constant
+    |   StringLiteral+
+    |   '(' expression ')'
+    ;
+
+postfixExpression
+    :
+    (   primaryExpression   )
+    ('(' argumentExpressionList? ')'
+    )*
+    ;
+
+argumentExpressionList
+    :   assignmentExpression (',' assignmentExpression)*
+    ;
+
+unaryExpression
+    :
+    (postfixExpression
+    |   unaryOperator castExpression
+    )
+    ;
+
+unaryOperator
+    :    '*' | '+' | '-'  | '!'
+    ;
+
+castExpression
+    :   '(' typeName ')' castExpression
+    |   unaryExpression
+    |   DigitSequence // for
+    ;
+
+multiplicativeExpression
+    :   castExpression (('*'|'/'|'%') castExpression)*
+    ;
+
+additiveExpression
+    :   multiplicativeExpression (('+'|'-') multiplicativeExpression)*
+    ;
+
+relationalExpression
+    :   additiveExpression (('<'|'>'|'<='|'>=') additiveExpression)*
+    ;
+
+equalityExpression
+    :   relationalExpression (('=='| '!=') relationalExpression)*
+    ;
+
+logicalAndExpression
+    :   equalityExpression ('&&' equalityExpression)*
+    ;
+
+logicalOrExpression
+    :   logicalAndExpression ( '||' logicalAndExpression)*
+    ;
+
+conditionalExpression
+    :   logicalOrExpression
+    ;
+
+assignmentExpression
+    :   conditionalExpression
+    |   unaryExpression assignmentOperator assignmentExpression
+    |   DigitSequence // for
+    ;
+
+assignmentOperator
+    :   '=' | '*=' | '/=' | '%=' | '+=' | '-='
+    ;
+
+expression
+    :   assignmentExpression (',' assignmentExpression)*
+    ;
+
+constantExpression
+    :   conditionalExpression
+    ;
+
+declaration
+    :   declarationSpecifiers initDeclaratorList? ';'
+    ;
+
+declarationSpecifiers
+    :   declarationSpecifier+
+    ;
+
+declarationSpecifiers2
+    :   declarationSpecifier+
+    ;
+
+declarationSpecifier
+    :   typeSpecifier
+    |   typeQualifier
+    ;
+
+initDeclaratorList
+    :   initDeclarator (',' initDeclarator)*
+    ;
+
+initDeclarator
+    :   declarator ('=' initializer)?
+    ;
+
+typeSpecifier
+    :   'খালি'
+    |   'বর্ণ'
+    |   'বাস্তবসংখ্যা'
+    |   'পূর্ণসংখ্যা'
+    |   'বুলিয়ান'
+    ;
+
+specifierQualifierList
+    :   (typeSpecifier| typeQualifier) specifierQualifierList?
+    ;
+
+typeQualifier
+    :   'const'
+    ;
+
+declarator
+    :   directDeclarator
+    ;
+
+directDeclarator
+    :   Identifier
+    |   '(' declarator ')'
+    |   directDeclarator '(' parameterTypeList ')'
+    |   directDeclarator '(' identifierList? ')'
+    ;
+
+nestedParenthesesBlock
+    :   (   ~('(' | ')')
+        |   '(' nestedParenthesesBlock ')'
+        )*
+    ;
+
+typeQualifierList
+    :   typeQualifier+
+    ;
+
+parameterTypeList
+    :   parameterList (',')?
+    ;
+
+parameterList
+    :   parameterDeclaration (',' parameterDeclaration)*
+    ;
+
+parameterDeclaration
+    :   declarationSpecifiers declarator
+    |   declarationSpecifiers2
+    ;
+
+identifierList
+    :   Identifier (',' Identifier)*
+    ;
+
+typeName
+    :   specifierQualifierList
+    ;
+
+initializer
+    :   assignmentExpression
+    ;
+
+statement
+    :   compoundStatement
+    |   expressionStatement
+    |   selectionStatement
+    |   iterationStatement
+    |   jumpStatement
+    ;
+
+compoundStatement
+    :   '{' blockItemList? '}'
+    ;
+
+blockItemList
+    :   blockItem+
+    ;
+
+blockItem
+    :   statement
+    |   declaration
+    ;
+
+expressionStatement
+    :   expression? ';'
+    ;
+
+selectionStatement
+    :   'যদি' '(' expression ')' statement ('নয়তো' statement)?
+    ;
+
+iterationStatement
+    :   For '(' forCondition ')' statement
+    ;
+
+forCondition
+	:   (forDeclaration | expression?) ';' forExpression? ';' forExpression?
+	;
+
+forDeclaration
+    :   declarationSpecifiers initDeclaratorList?
+    ;
+
+forExpression
+    :   assignmentExpression (',' assignmentExpression)*
+    ;
+
+jumpStatement
+    :   ('চলবে'
+    |   'থামবে'
+    |   'ফেরত' expression?
+    )
+    ';'
+    ;
+
+compilationUnit
+    :   translationUnit? EOF
+    ;
+
+translationUnit
+    :   externalDeclaration+
+    ;
+
+externalDeclaration
+    :   functionDefinition
+    |   declaration
+    |   ';' // stray ;
+    ;
+
+functionDefinition
+    :   declarationSpecifiers? declarator declarationList? compoundStatement
+    ;
+
+declarationList
+    :   declaration+
+    ;
+
+Break : 'থামবে';
+Char : 'বর্ণ';
+Const : 'ধ্রুবক';
+Continue : 'চলবে';
+Else : 'নয়তো';
+Float : 'পূর্ণসংখ্যা';
+For : 'যতক্ষণ';
+If : 'যদি';
+Int : 'বাস্তবসংখ্যা';
+Return : 'ফেরত';
+
+Void : 'খালি';
+
+Bool : 'বুলিয়ান';
+
+LeftParen : '(';
+RightParen : ')';
+LeftBrace : '{';
+RightBrace : '}';
+
+Less : '<';
+LessEqual : '<=';
+Greater : '>';
+GreaterEqual : '>=';
+
+Plus : '+';
+Minus : '-';
+Star : '*';
+Div : '/';
+Mod : '%';
+
+AndAnd : '&&';
+OrOr : '||';
+Not : '!';
+
+Semi : ';';
+Comma : ',';
+
+Assign : '=';
+StarAssign : '*=';
+DivAssign : '/=';
+ModAssign : '%=';
+PlusAssign : '+=';
+MinusAssign : '-=';
+
+Equal : '==';
+NotEqual : '!=';
+
+Identifier
+    :   IdentifierNondigit
+        (   IdentifierNondigit
+        |   Digit
+        )*
+    ;
+
+fragment
+IdentifierNondigit
+    :   Nondigit
+    ;
+
+fragment
+Nondigit
+    :   [\u0985-\u098B] | [\u098F-\u09DF] | [\u005F]
+    ;
+
+fragment
+Digit
+    :   [\u09e6-\u09eF]
+    ;
+
+Constant
+    :   IntegerConstant
+    |   FloatingConstant
+    |   CharacterConstant
+    ;
+
+fragment
+IntegerConstant
+    :   DecimalConstant
+    ;
+
+fragment
+DecimalConstant
+    :   NonzeroDigit Digit*
+    ;
+
+fragment
+NonzeroDigit
+    :   [\u09e7-\u09eF]
+    ;
+
+fragment
+FloatingConstant
+    :   DecimalFloatingConstant
+    ;
+
+fragment
+DecimalFloatingConstant
+    :   FractionalConstant ExponentPart?
+    |   DigitSequence ExponentPart
+    ;
+
+fragment
+FractionalConstant
+    :   DigitSequence? '.' DigitSequence
+    |   DigitSequence '.'
+    ;
+
+fragment
+ExponentPart
+    :   [eE] Sign? DigitSequence
+    ;
+
+fragment
+Sign
+    :   [+-]
+    ;
+
+DigitSequence
+    :   Digit+
+    ;
+
+fragment
+CharacterConstant
+    :   '\'' CCharSequence '\''
+    ;
+
+fragment
+CCharSequence
+    :   CChar+
+    ;
+
+fragment
+CChar
+    :   ~['\\\r\n]
+    |   EscapeSequence
+    ;
+
+fragment
+EscapeSequence
+    :   SimpleEscapeSequence
+    ;
+
+fragment
+SimpleEscapeSequence
+    :   '\\' ['"?abfnrtv\\]
+    ;
+
+StringLiteral
+    :   '"' SCharSequence? '"'
+    ;
+
+fragment
+SCharSequence
+    :   SChar+
+    ;
+
+fragment
+SChar
+    :   ~["\\\r\n]
+    |   EscapeSequence
+    |   '\\\n'   // Added line
+    |   '\\\r\n' // Added line
+    ;
+
+Whitespace
+    :   [ \t]+
+        -> skip
+    ;
+
+Newline
+    :   (   '\r' '\n'?
+        |   '\n'
+        )
+        -> skip
+    ;
+
+BlockComment
+    :   '/*' .*? '*/'
+        -> skip
+    ;
+
+LineComment
+    :   '//' ~[\r\n]*
+        -> skip
+    ;
